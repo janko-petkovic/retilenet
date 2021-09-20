@@ -1,0 +1,5 @@
+# ignore datasets
+	.datasets
+
+# ignore authomatic python files
+	.__pycache__
