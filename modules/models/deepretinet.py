@@ -1,7 +1,7 @@
 # After discovering that small bistratified cells are peripherally inhibited
 # by yellow input, we drop the segregation hypothesis and dive into further
 # exploring a very rudimental modelization of the pre-cortical visual pathway.
-# This is supposed to be represented by a sequence of stacked conv2d layers 
+# Before a DFC_LeNet_5 (a V1 surrogate) we stack a pile of conv2d layers 
 # (the abusively called .retina module of this class) which do not modify
 # the number of channels/features of the image (in_channels = out_channels)
 #
@@ -10,7 +10,7 @@
 #              in_channels : int)     ->    1 or 3 (BW vs colored img)
 #
 # For our purposes, we will use depth = 3, as we consider a visual pathway made
-# up of 3 stacked cellular types:
+# up of 3 cellular types:
 #
 # bipolar cell -> retinal ganglion (optic nerve) ->  LGN output (optic radiation)
 #
