@@ -1,8 +1,8 @@
 # ignore datasets
-.datasets
+datasets
 
 # ignore authomatic python files
-.__pycache__
+__pycache__
 	
 # ignore the bibliography
-.biblio
+biblio
