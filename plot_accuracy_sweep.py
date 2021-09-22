@@ -16,19 +16,26 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
     "dataset_name",
-    help="The name of the dataset on which the accuracy sweep has to be carried out",
+    help="Name of the dataset on which the accuracy sweep has to be carried out",
     type=str
 )
 
 parser.add_argument(
+    "depth",
+    help="Retinic module depth",
+    type=int
+)
+
+parser.add_argument(
     "retinic_kernel_size",
-    help="The retinic kernel size of the retinet to be used",
+    help="Retinic kernel size of the retinet to be used",
     type=int
 )
 
 args = parser.parse_args()
 
 dataset_name = args.dataset_name
+depth = args.depth
 kernel_size = args.retinic_kernel_size
 
 
@@ -42,9 +49,9 @@ SAVE_PATH = "plots/accuracy_sweeps"
 
 # Import data: csv -> dataframe -> array
 mean_path = os.path.join(
-    LOAD_PATH, f"accuracy_sweep_DFC_RetiNet_{kernel_size}_vs_mean.csv")
+    LOAD_PATH, f"accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_mean.csv")
 var_path = os.path.join(
-    LOAD_PATH, f"accuracy_sweep_DFC_RetiNet_{kernel_size}_vs_var.csv")
+    LOAD_PATH, f"accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_var.csv")
 
 results_mean = pd.read_csv(mean_path)
 results_var = pd.read_csv(var_path)
@@ -99,7 +106,7 @@ for i, ax in enumerate(axs):
         marker = 'o', facecolors="", edgecolors="black", label = "LeNet_5")
 
     ax.scatter(xyy[:,0], xyy[:,2], 
-        marker = 'x', c="r", s=60, label = f"RetiNet_{kernel_size}")
+        marker = 'x', c="r", s=60, label = f"RetiNet_d{depth}_rks{kernel_size}")
     
     # y limits
     ax.set_ylim([0,1])

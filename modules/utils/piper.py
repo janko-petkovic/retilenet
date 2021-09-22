@@ -39,11 +39,36 @@ class Piper(nn.Module):
     self.handles = []
 
 
-  def define_hooks(self, indexes):
+
+  def define_hooks(self, child_indexes):
     self.outputs = []
     self.remove_hooks()
-    for idx in indexes:
-      self._add_hook(idx)
+
+    for i, named_child in enumerate(self.net.named_children()):
+
+      if i in child_indexes:
+        name, child = named_child
+        print(f'Attaching hook to: {name}')
+        handle = child.register_forward_hook(self._hook_fn)
+        self.handles.append(handle)
+
+
+
+  def define_subhooks(self, child_idx, nephew_indexes):
+    self.outputs = []
+    self.remove_hooks()
+
+    for i, named_child in enumerate(self.net.named_children()):
+      if i == child_idx:
+        name, child = named_child
+        print(f"Accessing {name}")
+        for j, named_nephew in enumerate(child.named_children()):
+          nname, nephew = named_nephew
+          if j in nephew_indexes:
+            print(f'Attaching hook to: {nname}')
+            handle = nephew.register_forward_hook(self._hook_fn)
+            self.handles.append(handle)
+
 
 
   def get_hidden_outputs(self):
