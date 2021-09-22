@@ -1,3 +1,23 @@
+# After discovering that small bistratified cells are peripherally inhibited
+# by yellow input, we drop the segregation hypothesis and dive into further
+# exploring a very rudimental modelization of the pre-cortical visual pathway.
+# This is supposed to be represented by a sequence of stacked conv2d layers 
+# (the abusively called .retina module of this class) which do not modify
+# the number of channels/features of the image (in_channels = out_channels)
+#
+# Deep_RetiNet(depth : int,           ->    number of initial conv2d
+#              kernel_size : int,     ->    kernel size of the the stacked convs
+#              in_channels : int)     ->    1 or 3 (BW vs colored img)
+#
+# For our purposes, we will use depth = 3, as we consider a visual pathway made
+# up of 3 stacked cellular types:
+#
+# bipolar cell -> retinal ganglion (optic nerve) ->  LGN output (optic radiation)
+#
+# This is of course an EXTREMELY simplified model but surprisingly enough, on
+# simple datasets, a center-surround receptive field is evolved with a stabilizing
+# effect on the downstream hidden outputs.
+
 import torch
 import torch.nn as nn
 
