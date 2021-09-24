@@ -131,7 +131,7 @@ retinet.load_state_dict(reti_state_dict)
 # Attach a forward hook to the retinic layer of the retinet to get the
 # first hidden output.
 piper = Piper(retinet)
-piper.define_hooks([0])
+piper.define_subhooks(0,[6])
 
 
 

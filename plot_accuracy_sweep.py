@@ -128,7 +128,7 @@ for i, ax in enumerate(axs):
 # Save the figure and show preview
 SAVE_PATH = os.path.join(
     SAVE_PATH, 
-    f"{dataset_name}_{kernel_size}_accuracy_sweep.png"
+    f"accuracy_sweep_retinet_d{depth}_rks{kernel_size}_{dataset_name}.png"
 )
 
 plt.savefig(SAVE_PATH)
