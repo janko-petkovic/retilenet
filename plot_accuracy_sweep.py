@@ -106,7 +106,7 @@ for i, ax in enumerate(axs):
         marker = 'o', facecolors="", edgecolors="black", label = "LeNet_5")
 
     ax.scatter(xyy[:,0], xyy[:,2], 
-        marker = 'x', c="r", s=60, label = f"RetiNet_d{depth}_rks{kernel_size}")
+        marker = 'x', c="r", s=60, label = f"RetiLeNet")
     
     # y limits
     ax.set_ylim([0,1])
@@ -122,7 +122,7 @@ for i, ax in enumerate(axs):
     ax.set_xlabel(ax_config["xlabel"][i], fontsize=15, labelpad=15)
     ax.set_ylabel("Accuracy", fontsize=15, labelpad=15)
     
-    ax.legend(loc=8, fontsize=15)
+    ax.legend(loc=6, fontsize=15)
 
 
 # Save the figure and show preview

@@ -71,11 +71,11 @@ n_filters = retinas[0].shape[0]
 #----------------------------------------|
 
 
-fig = plt.figure(figsize=(5,5*depth))
+fig = plt.figure(figsize=(5,3*depth))
 fig.set_dpi(157)
 
 fig.tight_layout(
-    rect=[0,0,0.95,0.95],
+    rect=[0,0,0,0.95],
     w_pad = 10,
     h_pad = 0)
 
@@ -94,5 +94,7 @@ for i, cell in enumerate(retinas):
 
             cbar = plt.colorbar(shrink=0.8)
             cbar.ax.tick_params(labelsize=6) 
+
+plt.savefig("plots/retinas.png")
 
 plt.show()

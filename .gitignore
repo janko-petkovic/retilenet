@@ -1,8 +1,11 @@
 # ignore datasets
 datasets
 
-# ignore authomatic python files
+# ignore authomaticly generated files
 **/__pycache__
+.ipynb_checkpoints/
 	
 # ignore the bibliography
 biblio
+
+

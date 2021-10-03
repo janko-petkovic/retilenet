@@ -68,7 +68,7 @@ rks = args.rks
 
 PATH_TO_DATASET = f"datasets/{dataset_name}"
 PATH_TO_STATEDICTS = f"trained_models/{dataset_name}"
-PATH_TO_SAVE = "plots/box_plots"
+PATH_TO_SAVE = "small-figures"
 
 
 # ------- DEFINE THE CHOSEN EXAMPLE ------
@@ -149,7 +149,7 @@ scale_origs = []
 shift_hids = []
 shift_origs = []
 
-for i in range(1,41,4):
+for i in [1,11,39]:
   var = i/10
   modified = ScaleVar(example_tens, var)
 
@@ -159,7 +159,7 @@ for i in range(1,41,4):
   scale_hids.append(piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
 
 
-for i in range(-20,21,4):
+for i in [-20,0,20]:
   mean = i/10
   modified = ShiftMean(example_tens, mean)
 
@@ -182,11 +182,11 @@ cap_line_width = 0.8
 axis_line_width = 0.5
 grid_line_width = 0.3
 
-tick_label_size = 8
+tick_label_size = 10
 tick_padding_size = 2
 
-title_size = 13
-title_pad = 15
+title_size = 15
+title_pad = 10
 
 x_label_size = 12
 x_label_pad = 5
@@ -197,13 +197,15 @@ y_label_pad = 5
 
 # ----------- plotting ------------------
 fig, axs = plt.subplots(2,2)
-fig.set_size_inches(10,4.5)
+fig.set_size_inches(5.5,6)
 fig.set_dpi(157)
 
+fig.suptitle(f"{dataset_name}", size=20)
+
 fig.tight_layout(
-    rect=[0.02,0.02,1,0.95],
-    w_pad = 5,
-    h_pad = 2)
+    rect=[0.07,0.05,1,0.93],
+    w_pad = 0,
+    h_pad = 2.5)
 
 # Hashtable for subplot input and cosmetics
 cfg = {
@@ -222,11 +224,11 @@ cfg = {
 
     "y_lim" : [[-3,3], [-5,5]],
 
-    "x_ticks" : [[i for i in range(1,13,2)],
-                [i for i in range(1,13,2)]],
+    # "x_ticks" : [[i for i in range(1,13,2)],
+    #             [i for i in range(1,13,2)]],
     
-    "x_tick_labels" : [[i/10 for i in range(-20,21,8)],
-                       [i/10 for i in range(1,43,8)]]
+    "x_tick_labels" : [[-2,0,2],
+                       [0.1, 1.1, 3.9]]
 }
 
 for i, row in enumerate(axs):
@@ -266,19 +268,23 @@ for i, row in enumerate(axs):
             ax.set_ylim(cfg["y_lim"][i])
 
             ax.set_xlabel(cfg["x_label"][i][j], fontsize = x_label_size, labelpad=x_label_pad)
-            ax.set_ylabel("Pixel values", fontsize=y_label_size, labelpad=y_label_pad)
+            if not j:
+                ax.set_ylabel("Pixel values", fontsize=y_label_size, labelpad=y_label_pad)
 
-            ax.set_xticks(cfg["x_ticks"][i])
+            # ax.set_xticks(cfg["x_ticks"][i])
             ax.set_xticklabels(cfg["x_tick_labels"][i], fontsize = tick_label_size)
 
             ax.tick_params(axis='x', labelsize=tick_label_size, pad=tick_padding_size)
             ax.tick_params(axis='y', labelsize=tick_label_size, pad=tick_padding_size)
 
+            if j==1:
+                ax.tick_params(left=False, labelleft=False)
+
             ax.grid(axis="y", which='major', color='#888888', linestyle=':', linewidth = grid_line_width)
 
 
-axs[0,0].set_title(f"{dataset_name} example", fontsize=title_size, pad=title_pad)
-axs[0,1].set_title(f"Bipolar cell hidden output", fontsize=title_size, pad=title_pad)
+axs[0,0].set_title(f"Input", fontsize=title_size, pad=title_pad)
+axs[0,1].set_title(f"First HO", fontsize=title_size, pad=title_pad)
 
 
 # Save and show
@@ -287,4 +293,4 @@ PATH_TO_SAVE = os.path.join(
 )
 plt.savefig(PATH_TO_SAVE)
 
-# plt.show()
+plt.show()
