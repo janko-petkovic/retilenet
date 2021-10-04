@@ -47,20 +47,22 @@ parser.add_argument("example_idx",
 
 parser.add_argument(
     "depth",
-    help="Retinic module depth",
+    help="Number of precortical conv-drop-tanh blocks",
     type=int
 )
 
-parser.add_argument("rks",
-                    help="RetiNet retinic kernel size",
-                    type = int)
+parser.add_argument(
+    "kernel_size",
+    help="Kernel size of the precortical convolutional layers",
+    type=int
+)
 
 args = parser.parse_args()
 
 dataset_name = args.dataset_name
 example_idx = args.example_idx
 depth = args.depth
-rks = args.rks
+rks = args.kernel_size
 
 
 
