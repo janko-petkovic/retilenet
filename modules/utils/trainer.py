@@ -101,9 +101,9 @@ class Trainer():
       vloss, vacc = self._valid_epoch(validloader, optimizer, loss_fn)
 
       # gather the data for plotting
-      losses.append(loss)
-      v_losses.append(vloss)
-      v_accs.append(vacc)
+      losses.append(loss.cpu().detach().numpy())
+      v_losses.append(vloss.cpu().detach().numpy())
+      v_accs.append(vacc.cpu().detach().numpy())
 
       completed = (t*100)//epochs
       print(f"Training {completed}%: \t loss {loss:.5f}\t v_loss {vloss:.5f},\t v_acc {vacc:.5f}")
