@@ -4,7 +4,9 @@ datasets
 # ignore authomaticly generated files
 **/__pycache__
 .ipynb_checkpoints/
-	
+sys
+torch
+
 # ignore the bibliography
 biblio
 

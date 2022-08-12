@@ -103,10 +103,16 @@ for i, ax in enumerate(axs):
 
     # scatter the two charts
     ax.scatter(xyy[:,0],xyy[:,1],
-        marker = 'o', facecolors="", edgecolors="black", label = "LeNet_5")
+        marker = 'o', facecolors="white", edgecolors="black", label = "LeNet_5")
 
-    ax.scatter(xyy[:,0], xyy[:,2], 
-        marker = 'x', c="r", s=60, label = f"RetiLeNet")
+    ax.scatter(xyy[:,0],xyy[:,2],
+        marker = 'o', facecolors="white", edgecolors="blue", label = "LeNet_5 + batch norm")
+    
+    ax.scatter(xyy[:,0],xyy[:,3],
+        marker = 'o', facecolors="white", edgecolors="green", label = "LeNet_5 + instance norm")
+
+    ax.scatter(xyy[:,0], xyy[:,4], 
+        marker = 'x', color="r", s=60, label = f"RetiLeNet")
     
     # y limits
     ax.set_ylim([0,1])

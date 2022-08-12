@@ -121,7 +121,7 @@ in_channels = example_tens.shape[0]
 device = "cuda" if torch.cuda.is_available() else "cpu"
 retinet = Deep_RetiNet(depth = depth,
                        kernel_size = rks,
-                       in_channels = in_channels).eval()
+                       in_channels = in_channels).to(device).eval()
 
 reti_state_dict = torch.load(
     f'{PATH_TO_STATEDICTS}/trained_Deep_RetiNet_d{depth}_rks{rks}_state_dict.pt',
