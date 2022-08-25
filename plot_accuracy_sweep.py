@@ -1,4 +1,4 @@
-import os, re
+import os, re, sys
 import argparse
 import pandas as pd
 import numpy as np
@@ -12,32 +12,12 @@ import matplotlib.pyplot as plt
 
 
 # Parsing: dataset_name, retinic_kernel_size
-parser = argparse.ArgumentParser()
+# Example: $ python plot_accuracy_sweep.py MNIST True
+dataset_name = sys.argv[1]
+large_sweep = sys.argv[2]
 
-parser.add_argument(
-    "dataset_name",
-    help="Name of the dataset on which the accuracy sweep has to be carried out",
-    type=str
-)
-
-parser.add_argument(
-    "depth",
-    help="Number of precortical conv-drop-tanh blocks",
-    type=int
-)
-
-parser.add_argument(
-    "kernel_size",
-    help="Kernel size of the precortical convolutional layers",
-    type=int
-)
-
-args = parser.parse_args()
-
-dataset_name = args.dataset_name
-depth = args.depth
-kernel_size = args.kernel_size
-
+depth = 3 #args.depth
+kernel_size = 7 #args.kernel_size
 
 
 # IF YOU MOVE THE SCRIPT CHANGE ONLY THIS WITH NEW RELATIVE PATHS  <----------------------------------!!!
@@ -48,10 +28,16 @@ SAVE_PATH = "plots/accuracy_sweeps"
 
 
 # Import data: csv -> dataframe -> array
-mean_path = os.path.join(
-    LOAD_PATH, f"accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_mean.csv")
-var_path = os.path.join(
-    LOAD_PATH, f"accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_var.csv")
+if large_sweep:
+    mean_path = os.path.join(
+        LOAD_PATH, f"large_accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_mean.csv")
+    var_path = os.path.join(
+        LOAD_PATH, f"large_accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_var.csv")
+else:
+    mean_path = os.path.join(
+        LOAD_PATH, f"accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_mean.csv")
+    var_path = os.path.join(
+        LOAD_PATH, f"accuracy_sweep_Deep_RetiNet_d{depth}_rks{kernel_size}_vs_var.csv")
 
 results_mean = pd.read_csv(mean_path)
 results_var = pd.read_csv(var_path)
@@ -102,17 +88,28 @@ for i, ax in enumerate(axs):
     xyy = ax_config["data"][i]
 
     # scatter the two charts
-    ax.scatter(xyy[:,0],xyy[:,1],
-        marker = 'o', facecolors="white", edgecolors="black", label = "LeNet_5")
+    # ax.scatter(xyy[:,0],xyy[:,1],
+    #     marker = 'o', facecolors="white", edgecolors="black", label = "LeNet_5")
+    ax.plot(xyy[:,0],xyy[:,1],
+        marker = 'o', label = "LeNet_5")
 
-    ax.scatter(xyy[:,0],xyy[:,2],
-        marker = 'o', facecolors="white", edgecolors="blue", label = "LeNet_5 + batch norm")
+    ax.plot(xyy[:,0],xyy[:,3],
+        marker = '.', label = "LeNet_5 + BN")
     
-    ax.scatter(xyy[:,0],xyy[:,3],
-        marker = 'o', facecolors="white", edgecolors="green", label = "LeNet_5 + instance norm")
+    # ax.plot(xyy[:,0],xyy[:,5],
+    #     marker = 'x', label = "LeNet_5 + IN")
 
-    ax.scatter(xyy[:,0], xyy[:,4], 
-        marker = 'x', color="r", s=60, label = f"RetiLeNet")
+    ax.plot(xyy[:,0], xyy[:,6], 
+        marker = 'o', linewidth=2, mfc='white', mew=3, label = f"RetiLeNet")
+    
+    ax.plot(xyy[:,0],xyy[:,2],
+        marker = '.', label = "LeNet_5 + DA")
+
+    ax.plot(xyy[:,0],xyy[:,4],
+        marker = '.', label = "LeNet_5 + BN + DA")
+
+    ax.plot(xyy[:,0], xyy[:,7], 
+        marker = 'o', linewidth=3, mfc='white', mew=3, label = f"RetiLeNet + DA")
     
     # y limits
     ax.set_ylim([0,1])
@@ -132,10 +129,16 @@ for i, ax in enumerate(axs):
 
 
 # Save the figure and show preview
-SAVE_PATH = os.path.join(
-    SAVE_PATH, 
-    f"accuracy_sweep_retinet_d{depth}_rks{kernel_size}_{dataset_name}.png"
-)
+if large_sweep:
+    SAVE_PATH = os.path.join(
+        SAVE_PATH, 
+        f"accuracy_sweep_retinet_d{depth}_rks{kernel_size}_{dataset_name}.png"
+    )
+else:
+    SAVE_PATH = os.path.join(
+        SAVE_PATH, 
+        f"large_accuracy_sweep_retinet_d{depth}_rks{kernel_size}_{dataset_name}.png"
+    )
 
 plt.savefig(SAVE_PATH)
 

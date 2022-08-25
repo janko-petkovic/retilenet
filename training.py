@@ -19,7 +19,7 @@ For the classic data augmentation we only implement dfclenet5
 
 # Imports
 
-import os, sys
+import os, sys, random
 import torch
 torch.manual_seed(42)
 
@@ -31,6 +31,7 @@ from torch.nn import CrossEntropyLoss
 from tqdm import tqdm
 
 from torchvision import datasets, transforms
+import torchvision.transforms.functional as TF
 
 import gc
 
@@ -56,12 +57,17 @@ print(f'Using: {device}')
 ############
 
 #################### - interface - #########################
+# Example call:
+# $ python training.sh MNIST LeNet True
+# 
 # Get an argv handle for both dataset and neural network
 # MNIST - FashionMNIST - SVHN
-dataset_name = sys.argv[1] # "MNIST"         
+dataset_name = sys.argv[1]
 
 # LeNet - Deep_RetiNet - BNLeNet - INLeNet
-model_name = sys.argv[2] # "Deep_RetiNet"
+model_name = sys.argv[2]
+augment_data = sys.argv[3] # True or False
+
 
 # Parameters for Deep_RetiNet
 retinic_kernel_size = 7
@@ -86,12 +92,38 @@ IL = {
     "SVHN" : datasets.SVHN,
 }
 
+# Custom transforms for which we are testing
+class ShiftMeanTransform:
+    def __init__(self, mu_min: float, mu_max: float):
+        self.mu_min = mu_min
+        self.mu_max = mu_max
+
+    def __call__(self, x):
+        mu = random.uniform(self.mu_min, self.mu_max)
+        return x+mu
+
+class ScaleVarTransform:
+    def __init__(self, s_min, s_max):
+        self.s_min = s_min
+        self.s_max = s_max
+
+    def __call__(self, x):
+        s = random.uniform(self.s_min, self.s_max)
+        return (x-x.mean())/s + x.mean()
+
 
 if dataset_name == "SVHN":
     # pytorch does not use the same standards for all
     # datasets for some reasons I dont know why
     path = os.path.join(PATH_TO_DATASETS, "SVHN")
-    transform = transforms.ToTensor()
+
+    transform = [transforms.ToTensor()]
+    if augment_data:
+        transform += [ShiftMeanTransform(-2.,2.),
+                      ScaleVarTransform(-0.1, 4.)]
+
+    transform = transforms.Compose(transform)
+
 
     trainset = IL[dataset_name](
         path,
@@ -108,10 +140,16 @@ if dataset_name == "SVHN":
     )
 
 else:
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Pad(2)
-    ])
+    transform = [transforms.ToTensor()]
+
+    if augment_data:
+        transform += [ShiftMeanTransform(-2.,2.),
+                      ScaleVarTransform(-0.1, 4.)]
+
+    transform.append(transforms.Pad(2))
+
+    transform = transforms.Compose(transform)
+
 
     trainset = IL[dataset_name](
         PATH_TO_DATASETS,
@@ -147,18 +185,22 @@ testloader = DataLoader(testset,
 if model_name == "LeNet":
   model = DFC_LeNet_5(in_channels).to(device)
   model_save_name = "DFC_LeNet_5"
+  if augment_data: model_save_name += "_augmented"
 
 elif model_name == "Deep_RetiNet":
   model = Deep_RetiNet(depth, rks, in_channels).to(device)
   model_save_name = f"Deep_RetiNet_d{depth}_rks{rks}"
+  if augment_data: model_save_name += "_augmented"
 
 elif model_name == "BNLeNet":
   model = BNDFC_LeNet_5(in_channels).to(device)
   model_save_name = f"BNDFC_LeNet_5"
+  if augment_data: model_save_name += "_augmented"
 
 elif model_name == "INLeNet":
   model = INDFC_LeNet_5(in_channels).to(device)
   model_save_name = f"INDFC_LeNet_5"
+  if augment_data: model_save_name += "_augmented"
 
 
 optimizer = optimizer(model.parameters(), lr=start_lr)
