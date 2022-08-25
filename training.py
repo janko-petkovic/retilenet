@@ -91,19 +91,20 @@ if dataset_name == "SVHN":
     # pytorch does not use the same standards for all
     # datasets for some reasons I dont know why
     path = os.path.join(PATH_TO_DATASETS, "SVHN")
+    transform = transforms.ToTensor()
 
     trainset = IL[dataset_name](
         path,
         download = True,
         split = "train",
-        transform = transforms.ToTensor()
+        transform = transform
     )
 
     testset = IL[dataset_name](
         path,
         download = True,
         split = "test",
-        transform = transforms.ToTensor()
+        transform = transform
     )
 
 else:

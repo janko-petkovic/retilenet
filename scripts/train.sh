@@ -1,3 +1,5 @@
+cd ..
+
 python training.py MNIST BNLeNet
 python training.py FashionMNIST BNLeNet
 python training.py SVHN BNLeNet
