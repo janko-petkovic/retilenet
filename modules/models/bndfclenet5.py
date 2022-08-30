@@ -37,7 +37,7 @@ class BNDFC_LeNet_5(nn.Module):
 
   def forward(self,x):
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device =  'cpu' if torch.cuda.is_available() else 'cpu'
 
     dim = x.shape[0]
     out = self.c1(x)

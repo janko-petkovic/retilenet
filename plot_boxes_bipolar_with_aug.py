@@ -57,19 +57,12 @@ parser.add_argument(
     type=int
 )
 
-parser.add_argument(
-    "augmented",
-    help="If the model has been trained using data augmentation",
-    type=bool
-)
-
 args = parser.parse_args()
 
 dataset_name = args.dataset_name
 example_idx = args.example_idx
 depth = args.depth
 rks = args.kernel_size
-augmented = args.augmented
 
 
 # ------ DEFINE THE RELATIVE PATHS --------------------------------------<<<<<<---------------
@@ -129,22 +122,29 @@ retinet = Deep_RetiNet(depth = depth,
                        kernel_size = rks,
                        in_channels = in_channels).to(device).eval()
 
-if augmented:
-    reti_state_dict = torch.load(
-        f'{PATH_TO_STATEDICTS}/trained_Deep_RetiNet_d{depth}_rks{rks}_augmented_state_dict.pt',
-        map_location = device)
-else:
-    reti_state_dict = torch.load(
-        f'{PATH_TO_STATEDICTS}/trained_Deep_RetiNet_d{depth}_rks{rks}_state_dict.pt',
-        map_location = device)
+aug_retinet = Deep_RetiNet(depth = depth,
+                       kernel_size = rks,
+                       in_channels = in_channels).to(device).eval()
+
+aug_reti_state_dict = torch.load(
+    f'{PATH_TO_STATEDICTS}/trained_Deep_RetiNet_d{depth}_rks{rks}_augmented_state_dict.pt',
+    map_location = device)
+
+reti_state_dict = torch.load(
+    f'{PATH_TO_STATEDICTS}/trained_Deep_RetiNet_d{depth}_rks{rks}_state_dict.pt',
+    map_location = device)
 
 retinet.load_state_dict(reti_state_dict)
+aug_retinet.load_state_dict(aug_reti_state_dict)
 
 
 # Attach a forward hook to the retinic layer of the retinet to get the
 # first hidden output.
 piper = Piper(retinet)
 piper.define_subhooks(0,[0])
+
+aug_piper = Piper(aug_retinet)
+aug_piper.define_subhooks(0,[0])
 
 
 
@@ -158,28 +158,41 @@ piper.define_subhooks(0,[0])
 
 # ----------- DATA GENERATION --------------
 scale_hids = []
+scale_aug_hids = []
 scale_origs = []
 shift_hids = []
+shift_aug_hids = []
 shift_origs = []
 
-for i in range(1,41,4):
+x_vars = []
+x_means = []
+
+for i in range(1,440,24):
   var = i/10
+  x_vars.append(var)
+
   modified = ScaleVar(example_tens, var)
 
   retinet(modified.unsqueeze(axis=0).to(device))
+  aug_retinet(modified.unsqueeze(axis=0).to(device))
 
   scale_origs.append(modified.reshape(1,-1).squeeze().numpy())
   scale_hids.append(piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
+  scale_aug_hids.append(aug_piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
 
 
-for i in range(-20,21,4):
+for i in range(-120,121,12):
   mean = i/10
+  x_means.append(mean)
+
   modified = ShiftMean(example_tens, mean)
 
   retinet(modified.unsqueeze(axis=0).to(device))
+  aug_retinet(modified.unsqueeze(axis=0).to(device))
 
   shift_origs.append(modified.reshape(1,-1).squeeze().numpy())
   shift_hids.append(piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
+  shift_aug_hids.append(aug_piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
   
 
 
@@ -195,7 +208,7 @@ cap_line_width = 0.8
 axis_line_width = 0.5
 grid_line_width = 0.3
 
-tick_label_size = 8
+tick_label_size = 6.5
 tick_padding_size = 2
 
 title_size = 13
@@ -209,41 +222,44 @@ y_label_pad = 5
 
 
 # ----------- plotting ------------------
-fig, axs = plt.subplots(2,2)
+
+fig, axs = plt.subplots(2,3)
 fig.set_size_inches(10,4.5)
 fig.set_dpi(157)
 
 fig.tight_layout(
-    rect=[0.02,0.02,1,0.95],
+    rect=[0.02,0.02,1,0.90],
     w_pad = 5,
     h_pad = 2)
 
+
 # Hashtable for subplot input and cosmetics
 cfg = {
-    "x" : [[shift_origs, shift_hids],
-           [scale_origs, scale_hids]],
+    "fill" : [[9.5,12.5], [1, 2.5]],
+    "x" : [[shift_origs, shift_hids, shift_aug_hids],
+           [scale_origs, scale_hids, scale_aug_hids]],
 
-    "box_color" : ["black", "black"],
+    "box_color" : ["black", "black", "black"],
 
-    "median_color" : ["red","teal"],
+    "median_color" : ["red","teal", "green"],
 
-    "violin_color" : ["darkred", "teal"],
+    "violin_color" : ["darkred", "teal", "green"],
 
 
-    "x_label" : [[r"$\mu$",r"$\mu$"],
-                 [r"$\sigma$",r"$\sigma$"]],
+    "x_label" : [[r"$\mu$",r"$\mu$",r"$\mu$"],
+                 [r"$\sigma$",r"$\sigma$",r"$\sigma$"]],
 
-    "y_lim" : [[-3,3], [-5,5]],
+    "y_lim" : [[-20,20], [-20,20], [-20,20]],
 
-    "x_ticks" : [[i for i in range(1,13,2)],
-                [i for i in range(1,13,2)]],
-    
-    "x_tick_labels" : [[i/10 for i in range(-20,21,8)],
-                       [i/10 for i in range(1,43,8)]]
+    "x_ticks" : [x_means, x_vars],
+   
+    "x_tick_labels" : [x_means, x_vars]
 }
 
 for i, row in enumerate(axs):
     for j, ax in enumerate(row):
+            if j==2:
+                ax.axvspan(*cfg["fill"][i], alpha=0.2, color='gray', label='augmented training range')
 
             bp = ax.violinplot(cfg["x"][i][j],
                                 showmedians=False,
@@ -281,7 +297,8 @@ for i, row in enumerate(axs):
             ax.set_xlabel(cfg["x_label"][i][j], fontsize = x_label_size, labelpad=x_label_pad)
             ax.set_ylabel("Pixel values", fontsize=y_label_size, labelpad=y_label_pad)
 
-            ax.set_xticks(cfg["x_ticks"][i])
+            # ax.set_xticks(cfg["x_ticks"][i])
+            ax.locator_params(axis='x', nbins=11)
             ax.set_xticklabels(cfg["x_tick_labels"][i], fontsize = tick_label_size)
 
             ax.tick_params(axis='x', labelsize=tick_label_size, pad=tick_padding_size)
@@ -292,17 +309,13 @@ for i, row in enumerate(axs):
 
 axs[0,0].set_title(f"{dataset_name} example", fontsize=title_size, pad=title_pad)
 axs[0,1].set_title(f"Bipolar cell hidden output", fontsize=title_size, pad=title_pad)
+axs[0,2].set_title(f"Augmented bipolar cell hidden\noutput", fontsize=title_size, pad=title_pad)
 
 
 # Save and show
-if augmented:
-    PATH_TO_SAVE = os.path.join(
-        PATH_TO_SAVE, f"boxes_retinet_d{depth}_rks{rks}_{dataset_name}_bipolar_augmented"
-    )
-else:
-    PATH_TO_SAVE = os.path.join(
-        PATH_TO_SAVE, f"boxes_retinet_d{depth}_rks{rks}_{dataset_name}_bipolar"
-    )
+PATH_TO_SAVE = os.path.join(
+    PATH_TO_SAVE, f"boxes_retinet_d{depth}_rks{rks}_{dataset_name}_bipolar_both"
+)
 plt.savefig(PATH_TO_SAVE)
 
 # plt.show()

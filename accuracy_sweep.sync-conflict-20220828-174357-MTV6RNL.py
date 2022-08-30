@@ -33,7 +33,7 @@ from modules.utils import Trainer
 from modules.models import DFC_LeNet_5, Deep_RetiNet, BNDFC_LeNet_5, INDFC_LeNet_5
 
 
-device = 'cpu' if torch.cuda.is_available() else 'cpu'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print(f'Using: {device}')
 
 
@@ -92,10 +92,10 @@ class ScaleVar(object):
 dataset_name = sys.argv[1]
 
 # Large sweep to test robustness of data augmented trainings
-large_sweep = sys.argv[2] == 'True'
+large_sweep = sys.argv[2]
 if large_sweep:
-    mean_range = [i for i in range(-120,121,12)]
-    var_range = [i for i in range(1,441,24)]
+    mean_range = [i for i in range(-240,241,24)]
+    var_range = [i for i in range(1,480,24)]
 else:
     mean_range = [i for i in range(-20,21,2)]
     var_range = [i for i in range(1,41,2)]
@@ -133,8 +133,8 @@ if dataset_name == "SVHN":
 
 else:
     transform = transforms.Compose([
-        transforms.Pad(2),
-        transforms.ToTensor()
+        transforms.ToTensor(),
+        transforms.Pad(2)
     ])
 
     testset = IL[dataset_name](
@@ -394,7 +394,7 @@ plt.scatter(printable_var[:,0], printable_var[:,7],
 
 plt.legend(loc=3, fontsize=15)
 
-# plt.show()
+plt.show()
 
 
 

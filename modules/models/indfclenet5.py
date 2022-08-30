@@ -37,7 +37,7 @@ class INDFC_LeNet_5(nn.Module):
 
   def forward(self,x):
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cpu' if torch.cuda.is_available() else 'cpu'
 
     dim = x.shape[0]
     out = self.c1(x)
@@ -76,7 +76,7 @@ def test(in_ch):
 
   from pytorch_model_summary import summary
   
-  device = 'cuda' if torch.cuda.is_available() else 'cpu'
+  device = 'cpu' if torch.cuda.is_available() else 'cpu'
   model = INDFC_LeNet_5(in_ch).to(device)
   input = torch.zeros(2,in_ch,32,32).to(device)
 
