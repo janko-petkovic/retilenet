@@ -164,12 +164,12 @@ shift_hids = []
 shift_aug_hids = []
 shift_origs = []
 
-x_vars = []
-x_means = []
+x_shift = []
+x_scale = []
 
-for i in range(1,440,24):
+for i in range(1,440,48):
   var = i/10
-  x_vars.append(var)
+  x_scale.append(var)
 
   modified = ScaleVar(example_tens, var)
 
@@ -181,9 +181,9 @@ for i in range(1,440,24):
   scale_aug_hids.append(aug_piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
 
 
-for i in range(-120,121,12):
+for i in range(-120,121,24):
   mean = i/10
-  x_means.append(mean)
+  x_shift.append(mean)
 
   modified = ShiftMean(example_tens, mean)
 
@@ -194,122 +194,65 @@ for i in range(-120,121,12):
   shift_hids.append(piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
   shift_aug_hids.append(aug_piper.get_hidden_outputs()[0].reshape(1,-1).squeeze())
   
+x_shift = np.array(x_shift)
+x_scale = np.array(x_scale)
 
+# New plots
+fig, axs = plt.subplots(2,1, figsize=(4,6), dpi=200)
+fig.tight_layout(pad=2)
 
-# ---------- AESTHETICS SETUP -----------------
-# Boxplot
-median_width = 2
-box_line_width = 0.8
-whis_line_width = 0.8
-cap_line_width = 0.8
-
-
-# Outer chart features
-axis_line_width = 0.5
-grid_line_width = 0.3
-
-tick_label_size = 6.5
-tick_padding_size = 2
-
-title_size = 13
-title_pad = 15
-
-x_label_size = 12
-x_label_pad = 5
-
-y_label_size = 12
-y_label_pad = 5
-
-
-# ----------- plotting ------------------
-
-fig, axs = plt.subplots(2,3)
-fig.set_size_inches(10,4.5)
-fig.set_dpi(157)
-
-fig.tight_layout(
-    rect=[0.02,0.02,1,0.90],
-    w_pad = 5,
-    h_pad = 2)
-
-
-# Hashtable for subplot input and cosmetics
-cfg = {
-    "fill" : [[9.5,12.5], [1, 2.5]],
-    "x" : [[shift_origs, shift_hids, shift_aug_hids],
-           [scale_origs, scale_hids, scale_aug_hids]],
-
-    "box_color" : ["black", "black", "black"],
-
-    "median_color" : ["red","teal", "green"],
-
-    "violin_color" : ["darkred", "teal", "green"],
-
-
-    "x_label" : [[r"$\mu$",r"$\mu$",r"$\mu$"],
-                 [r"$\sigma$",r"$\sigma$",r"$\sigma$"]],
-
-    "y_lim" : [[-20,20], [-20,20], [-20,20]],
-
-    "x_ticks" : [x_means, x_vars],
-   
-    "x_tick_labels" : [x_means, x_vars]
+orig_style = {
+        'showcaps' : False,
+        'boxprops' : {'color' : 'tab:red', 'facecolor' : 'white', 'linewidth' : 1.5},
+        'whiskerprops' : {'color' : 'tab:red', 'linewidth' : 1.5},
+        'medianprops' : {'color' : 'tab:red', 'linewidth' : 3}
 }
 
-for i, row in enumerate(axs):
-    for j, ax in enumerate(row):
-            if j==2:
-                ax.axvspan(*cfg["fill"][i], alpha=0.2, color='gray', label='augmented training range')
+hid_style = {
+        'showcaps' : False,
+        'boxprops' : {'color' : 'tab:green', 'facecolor' : 'white', 'linewidth' : 1.5},
+        'whiskerprops' : {'color' : 'tab:green', 'linewidth' : 1.5},
+        'medianprops' : {'color' : 'tab:green', 'linewidth' : 3},
+}
 
-            bp = ax.violinplot(cfg["x"][i][j],
-                                showmedians=False,
-                                showextrema=False,
-                                bw_method="scott")
-
-            for body in bp["bodies"]:
-                body.set_facecolor(cfg["violin_color"][j])
-                body.set_edgecolor(cfg["violin_color"][j])
-                body.set_linewidth(0.3)
-            
-            bp = ax.boxplot(cfg["x"][i][j], sym="",
-                        whis=1.5, vert=True, widths=0.3,
-                        showcaps=False, patch_artist=False
-                        )
-
-            for median in bp['medians']:
-                median.set(color=cfg["median_color"][j], linewidth=median_width)
-
-            for box in bp["boxes"]:
-                box.set(linewidth=box_line_width, color=cfg["box_color"][j])
+aug_hid_style = {
+        'showcaps' : False,
+        'boxprops' : {'color' : 'tab:blue', 'facecolor' : 'white', 'linewidth' : 1.5},
+        'whiskerprops' : {'color' : 'tab:blue', 'linewidth' : 1.5},
+        'medianprops' : {'color' : 'tab:blue', 'linewidth' : 3},
+}
 
 
-            for whis in bp["whiskers"]:
-                whis.set(linewidth=whis_line_width)
-
-            for cap in bp["caps"]:
-                cap.set(linewidth=cap_line_width)
-
-            for pos in ["top", "bottom", "right", "left"]:
-                ax.spines[pos].set_linewidth(axis_line_width)
-
-            ax.set_ylim(cfg["y_lim"][i])
-
-            ax.set_xlabel(cfg["x_label"][i][j], fontsize = x_label_size, labelpad=x_label_pad)
-            ax.set_ylabel("Pixel values", fontsize=y_label_size, labelpad=y_label_pad)
-
-            # ax.set_xticks(cfg["x_ticks"][i])
-            ax.locator_params(axis='x', nbins=11)
-            ax.set_xticklabels(cfg["x_tick_labels"][i], fontsize = tick_label_size)
-
-            ax.tick_params(axis='x', labelsize=tick_label_size, pad=tick_padding_size)
-            ax.tick_params(axis='y', labelsize=tick_label_size, pad=tick_padding_size)
-
-            ax.grid(axis="y", which='major', color='#888888', linestyle=':', linewidth = grid_line_width)
+ax = axs[0]
+ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
+bp1 = ax.boxplot(shift_origs, sym='', whis=[0,100], positions=x_shift-0.5, widths=0.5, showfliers=True, 
+                patch_artist=True, **orig_style)
+bp2 = ax.boxplot(shift_hids, sym='', positions=x_shift, widths=0.5, showfliers=True,
+                patch_artist=True, **hid_style)
+bp3 = ax.boxplot(shift_aug_hids, sym='', positions=x_shift+0.5, widths=0.5, showfliers=True,
+                patch_artist=True, **aug_hid_style)
+ax.set_xlabel(r'$\mu$')
+ax.set_xticks(x_shift[::2])
+ax.set_xticklabels(x_shift[::2])
+ax.set_ylim(-20,15)
+ax.set_title(dataset_name)
+ax.legend([bp1['medians'][0], bp2['medians'][0], bp3['medians'][0]], ['example', 'hidden out', 'aug hidden out'], loc='upper right', ncol=1, prop=dict(size=6))
 
 
-axs[0,0].set_title(f"{dataset_name} example", fontsize=title_size, pad=title_pad)
-axs[0,1].set_title(f"Bipolar cell hidden output", fontsize=title_size, pad=title_pad)
-axs[0,2].set_title(f"Augmented bipolar cell hidden\noutput", fontsize=title_size, pad=title_pad)
+
+ax = axs[1]
+ax.axhline(y=0, color='gray', linestyle='--', linewidth=1)
+bp1 = ax.boxplot(scale_origs, sym='', whis=[0,100], positions=x_scale-0.5, widths=0.5, showfliers=True, 
+                patch_artist=True, **orig_style)
+bp2 = ax.boxplot(scale_hids, sym='', positions=x_scale, widths=0.5, showfliers=True,
+                patch_artist=True, **hid_style)
+bp3 = ax.boxplot(scale_hids, sym='', positions=x_scale+0.5, widths=0.5, showfliers=True,
+                patch_artist=True, **aug_hid_style)
+ax.set_xlabel(r'$\sigma$')
+ax.set_xticks(x_scale[::2])
+ax.set_xticklabels(x_scale[::2])
+ax.set_ylim(-3, 3.5)
+ax.legend([bp1['medians'][0], bp2['medians'][0], bp3['medians'][0]], ['example', 'hidden out', 'aug hidden out'], loc='upper right', ncol=1, prop=dict(size=6))
 
 
 # Save and show
@@ -318,4 +261,4 @@ PATH_TO_SAVE = os.path.join(
 )
 plt.savefig(PATH_TO_SAVE)
 
-# plt.show()
+plt.show()
