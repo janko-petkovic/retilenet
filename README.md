@@ -1,4 +1,4 @@
-# RetiLeNet (retinet)
+# RetiLeNet
 This is the code used to execute the experiments and generate the charts reported in the RetiLeNet submission.
 
 Note to the reader: *Unfortunately, the final name was chosen after the whole study was completed using the
