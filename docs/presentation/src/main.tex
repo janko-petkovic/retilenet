@@ -1,0 +1,48 @@
+%! TeX program = lualatex
+
+\documentclass{beamer}
+
+
+
+\usepackage{tabularx}
+\usepackage{makecell}
+
+\title{Spontaneous emergence of robustness to light variation in CNNs with
+precortically inspired module}
+
+\author{
+	% \hspace{.13\textwidth}
+	\begin{tabular}{ c p{.01\textwidth} c}
+		\centering
+		Janko Petkovic  && Rita Fioresi \\[6pt]
+		\tiny \makecell{Institute of Experimental Epileptology \\ and Cognition
+		Research, \\Bonn University Medicine} &&
+		\tiny \makecell{Department of Pharmacy \\and Biotechnologies,\\Bologna
+		University}
+	\end{tabular}
+}
+\date{\centering \vspace{30pt} 8 December 2023}
+
+\begin{document}
+
+	% Title
+	\begin{frame}
+		\titlepage
+	\end{frame}
+
+	\begin{frame}\small
+		\begin{minipage}{.5\textwidth}
+		Consider an image $\vec{x}$, with pixels $x_i$.\\
+		We define the \textbf{brightness change} as the mean offset
+		\begin{equation*}\raggedleft
+			x_i \rightarrow x_i - \mathbf{\mu}
+		\end{equation*}
+		and the \textbf{contrast change} as the rescaling
+		\begin{equation*}
+			x_i \rightarrow \frac{x_i - \langle\,\vec{x\,}\rangle}{\sigma} +
+			\langle \, \vec{x} \, \rangle
+		\end{equation*}
+			
+		\end{minipage}
+	\end{frame}
+\end{document}

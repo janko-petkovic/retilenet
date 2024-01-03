@@ -229,14 +229,17 @@ bp1 = ax.boxplot(shift_origs, sym='', whis=[0,100], positions=x_shift-0.5, width
                 patch_artist=True, **orig_style)
 bp2 = ax.boxplot(shift_hids, sym='', positions=x_shift, widths=0.5, showfliers=True,
                 patch_artist=True, **hid_style)
-bp3 = ax.boxplot(shift_aug_hids, sym='', positions=x_shift+0.5, widths=0.5, showfliers=True,
-                patch_artist=True, **aug_hid_style)
+# bp3 = ax.boxplot(shift_aug_hids, sym='', positions=x_shift+0.5, widths=0.5, showfliers=True,
+#                 patch_artist=True, **aug_hid_style)
 ax.set_xlabel(r'$\mu$')
+ax.set_ylabel('Pixel values')
 ax.set_xticks(x_shift[::2])
 ax.set_xticklabels(x_shift[::2])
 ax.set_ylim(-20,15)
 ax.set_title(dataset_name)
-ax.legend([bp1['medians'][0], bp2['medians'][0], bp3['medians'][0]], ['example', 'hidden out', 'aug hidden out'], loc='upper right', ncol=1, prop=dict(size=6))
+ax.legend([bp1['medians'][0], bp2['medians'][0]],#, bp3['medians'][0]], 
+          ['example', 'hidden out'],#, 'aug hidden out'],
+          loc='upper right', ncol=1, prop=dict(size=6))
 
 
 
@@ -246,13 +249,17 @@ bp1 = ax.boxplot(scale_origs, sym='', whis=[0,100], positions=x_scale-0.5, width
                 patch_artist=True, **orig_style)
 bp2 = ax.boxplot(scale_hids, sym='', positions=x_scale, widths=0.5, showfliers=True,
                 patch_artist=True, **hid_style)
-bp3 = ax.boxplot(scale_hids, sym='', positions=x_scale+0.5, widths=0.5, showfliers=True,
-                patch_artist=True, **aug_hid_style)
+# bp3 = ax.boxplot(scale_hids, sym='', positions=x_scale+0.5, widths=0.5, showfliers=True,
+#                 patch_artist=True, **aug_hid_style)
 ax.set_xlabel(r'$\sigma$')
+ax.set_ylabel('Pixel values')
 ax.set_xticks(x_scale[::2])
 ax.set_xticklabels(x_scale[::2])
 ax.set_ylim(-3, 3.5)
-ax.legend([bp1['medians'][0], bp2['medians'][0], bp3['medians'][0]], ['example', 'hidden out', 'aug hidden out'], loc='upper right', ncol=1, prop=dict(size=6))
+ax.legend([bp1['medians'][0], bp2['medians'][0]],#, bp3['medians'][0]], 
+          ['example', 'hidden out'],#, 'aug hidden out'],
+          loc='upper right', ncol=1, prop=dict(size=6))
+# ax.legend([bp1['medians'][0], bp2['medians'][0], bp3['medians'][0]], ['example', 'hidden out', 'aug hidden out'], loc='upper right', ncol=1, prop=dict(size=6))
 
 
 # Save and show
