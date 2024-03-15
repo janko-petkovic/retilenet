@@ -70,6 +70,8 @@ class Trainer():
 
     self.net.eval()
 
+    # Possible fix for running out of memory!
+    # with torch.no_grad():
     for v_batch, v_labels in validloader:
 
       v_batch, v_labels = v_batch.to(self.device), v_labels.to(self.device)
